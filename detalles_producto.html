@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>elusado</title>
+    <link rel="apple-touch-icon" href="img/apple-icon.png">
+    <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.ico">
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/templatemo.css">
+    <link rel="stylesheet" href="css/custom.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;200;300;400;500;700;900&display=swap">
+    <link rel="stylesheet" href="css/fontawesome.min.css">
+    
+    <script src="db_simulacion/funciones.js"></script>
+
+<style>
+    #imagenProducto {
+        width: 100%;
+        height: 300px;
+        object-fit: contain;
+        border-radius: 10px;
+        background-color: #f0f0f0;
+    }
+</style>
+
+</head>
+<body>
+    <div id="header"></div>
+
+    <!-- Inicio detalles de los productos-->
+    
+    <!-- Inicio contenido -->
+
+    <section class="bg-light">
+        <div class="container pb-5">
+            <div class="row">
+                <div class="col-lg-5 mt-5">
+                    <div class="card mb-3">
+                        <img class="card-img img-fluid" src="" alt="Card image cap" id="imagenProducto">
+                    </div>
+                </div>
+                <!-- col end -->
+                <div class="col-lg-7 mt-5">
+                    <div class="card">
+                        <div class="card-body">
+                            <h1 class="h2" id="nombreProducto"></h1>
+                            <p class="h3 py-2" id="precioProducto"></p>
+                            <p class="py-2" id="clasificacionProducto">    
+                            </p>
+                            <h6>Descripcion:</h6>
+                            <p id="descripcionProducto"></p>
+                            
+                            <h6>Especificaciones:</h6>
+                            <ul class="list-unstyled pb-3" id="especificacionesProducto"></ul>
+                                
+                            </ul>
+
+                     
+                                <div class="row pb-3">
+                                    <div class="col d-grid">
+                                        <a class="btn btn-success btn-lg" name="submit" value="buy" href="#" id="botonAgregar">Agregar</a>
+                                    </div>
+                                    <div class="col d-grid">
+                                        <button class="btn btn-success btn-lg" name="submit" value="addtocard" onclick="window.history.back()">Regresar</button>
+                                    </div>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Script para obtener el producto que se encuentra alamcenado-->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const codigoProducto = urlParams.get('codigoProducto');
+
+        const producto = obtenerCelularPorCodigo(codigoProducto);
+
+        if (producto) {
+            document.getElementById('nombreProducto').textContent = producto.nombre;
+            document.getElementById('precioProducto').textContent = `$${producto.precio.toLocaleString('es-CO')}`;
+            document.getElementById('descripcionProducto').textContent = producto.descripcion;
+            document.getElementById('imagenProducto').src = producto.imagen;
+
+            const especificacionesProducto = document.getElementById('especificacionesProducto');
+            especificacionesProducto.innerHTML = ""; // Limpiar antes
+
+            if (producto.especificaciones && Array.isArray(producto.especificaciones)) {
+                producto.especificaciones.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+                    especificacionesProducto.appendChild(li);
+                });
+            } else {
+                especificacionesProducto.innerHTML = "<li>Especificaciones no disponibles</li>";
+            }
+
+            const estrellas = `<i class="text-warning fa fa-star"></i>`.repeat(producto.calificacion) +
+                              `<i class="text-secondary fa fa-star"></i>`.repeat(5 - producto.calificacion);
+
+            document.getElementById('clasificacionProducto').innerHTML = estrellas;
+        }
+
+        // Agregar producto por medio del evento
+        document.getElementById('botonAgregar').addEventListener('click', function() {
+        agregarCelular(producto, false);
+        window.history.back();
+});
+
+
+    });
+</script>
+
+
+    
+    
+    <!-- Finalizo contenido-->
+
+    <!-- Fin de los  detalles de los productos-->
+
+    <!-- PIE DE PAGINA-->
+    <div id="footer"></div>
+    <!-- Scripts -->
+    <script src="js/jquery-1.11.0.min.js"></script>
+    <script src="js/jquery-migrate-1.2.1.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/templatemo.js"></script>
+    <script src="js/custom.js"></script>
+    // Cargar header y footer
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            cargarFragmento("header", "header.html");
+            cargarFragmento("footer", "footer.html");
+        });
+    </script>
+</body>
+</html>
