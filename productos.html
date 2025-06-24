@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>elusado</title>
+    <link rel="apple-touch-icon" href="img/apple-icon.png">
+    <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.ico">
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/templatemo.css">
+    <link rel="stylesheet" href="css/custom.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;200;300;400;500;700;900&display=swap">
+    <link rel="stylesheet" href="css/fontawesome.min.css">
+    
+    <script src="db_simulacion/funciones.js"></script>
+
+    <style>
+        #carrito {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="header"></div>
+
+    <!-- INICIO LISTADO DE PRODUCTOS -->
+    <div class="container py-5">
+        <div class="row">
+            <!-- Categorías -->
+            <div class="col-lg-2" id="categorias">
+                <h1 class="h2 pb-4">Categorías</h1>
+                <ul class="list-unstyled" id="lista-categorias">
+                    <li class="pb-3">
+                        <a class="collapsed d-flex justify-content-between text-decoration-none" href="productos.html?categoria=todos">
+                            Todos los productos
+                        </a>
+                    </li>  
+                </ul>
+            </div>
+
+            <!-- Productos -->
+            <div class="col-lg-8">
+                <div class="row" id="productos"></div>
+
+                <!-- Paginación -->
+                <div class="row mt-4">
+                    <div class="col">
+                        <ul class="pagination pagination-lg justify-content-end">
+                            <li class="page-item disabled">
+                                <a class="page-link active rounded-0 mr-3 shadow-sm border-top-0 border-left-0" href="#" tabindex="-1">1</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link rounded-0 mr-3 shadow-sm border-top-0 border-left-0 text-dark" href="#">2</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link rounded-0 shadow-sm border-top-0 border-left-0 text-dark" href="#">3</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carrito -->
+             
+            <div class="col-lg-2 bg-light p-4">
+                <h3 class="h3 pb-2">Carrito de Compras</h3>
+                <ul id="carrito" class="list-group"></ul>
+                <p class="text-right pt-2"><strong>Total a pagar:</strong> $ <strong><span id="total">0</span></strong></p>
+                <div id="boton-vaciar" class="btn btn-danger text-decoration-none mt-3" onclick="vaciarCarrito()">Vaciar</div>
+                <div class="btn btn-success text-decoration-none mt-2" id="boton-pagar">
+                    <a class="text-decoration-none btn-success text-white" href="pago.html" target="_blank">Pagar</a>
+                </div>
+            </div>
+            <script>
+                mostrarCarrito ();
+             </script>
+        </div>
+    </div>
+    <!-- FIN LISTADO DE PRODUCTOS -->
+
+    
+
+    <script>
+        // Cargar categorías dinámicamente
+        const categorias = obtenerCategorias();
+        const ulCategorias = document.querySelector('#lista-categorias');
+
+        categorias.forEach(categoria => {
+            const li = document.createElement('li');
+            li.className = 'pb-2';
+            li.innerHTML = `
+                <a href="productos.html?categoria=${categoria.codigo}" class="collapsed d-flex justify-content-between text-decoration-none small">
+                    ${categoria.nombre}</a>
+            `;
+            ulCategorias.appendChild(li);
+        });
+
+        // Cargar productos según categoría
+        const params = new URLSearchParams(window.location.search);
+        const categoria = params.get('categoria') || "todos";
+
+        const productos = obtenerCelulares(categoria);
+        const productosContainer = document.getElementById('productos');
+
+        productos.forEach(producto => {
+            const col = document.createElement('div');
+            col.className = 'col-md-4 d-flex align-items-stretch';
+
+            const estrellasLlenas = '<i class="text-warning fa fa-star"></i>'.repeat(producto.calificacion);
+            const estrellasVacias = '<i class="text-muted fa fa-star"></i>'.repeat(5 - producto.calificacion);
+
+            col.innerHTML = `
+                <div class="card mb-4 product-wap rounded-8 p-2">
+                    <div class="card rounded-8">
+                        <img class="card-img rounded-8" src="${producto.imagen}" alt="${producto.nombre}" style="width: 100%; height: 200px; object-fit: contain;">
+                        <div class="card-img-overlay rounded-8 product-overlay d-flex align-items-center justify-content-center">
+                            <ul class="list-unstyled">
+                                <li><a class="btn btn-success text-white mt-2" href="detalles_producto.html?codigoProducto=${producto.codigo}"><i class="far fa-eye"></i></a></li>
+                                <li><a class="btn btn-success text-white mt-2 btn-add" href="#"><i class="fas fa-cart-plus"></i></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <a href="shop-single.html" class="h5 text-decoration-none fw-bold">${producto.nombre}</a>
+                        <p>${producto.descripcion}</p>
+                        <p>${producto.estado}</p>
+                        <p class="text-center mb-0">$${producto.precio.toLocaleString('es-CO')}</p>
+                        <ul class="list-unstyled d-flex justify-content-center mb-1">
+                            <li>${estrellasLlenas + estrellasVacias}</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+
+            productosContainer.appendChild(col);
+                 col.querySelector(".btn-add").addEventListener('click', (e) => {
+                 e.preventDefault(); // Evita navegación si hay href
+                 agregarCelular(producto);
+            });
+        });
+        
+    </script>
+
+    <!-- PIE DE PAGINA-->
+    <div id="footer"></div>
+    <!-- Scripts -->
+    <script src="js/jquery-1.11.0.min.js"></script>
+    <script src="js/jquery-migrate-1.2.1.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/templatemo.js"></script>
+    <script src="js/custom.js"></script>
+    // Cargar header y footer
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            cargarFragmento("header", "header.html");
+            cargarFragmento("footer", "footer.html");
+        });
+    </script>
+</body>
+</html>
